@@ -1,4 +1,4 @@
-# Generated on: 09/18/2017 12:21:49
+# Generated on: 09/18/2017 14:17:59
 # Description: Helpful PowerShell Modules
 # Author: Jacob Hands <jacob@gogit.io>
 
@@ -109,3 +109,5 @@ Function Test-Platform {
         }
     }
 }
+
+Export-ModuleMember -Function Get-Platform,Test-Platform

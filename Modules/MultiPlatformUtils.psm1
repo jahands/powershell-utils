@@ -56,3 +56,5 @@ Function Test-Platform {
         }
     }
 }
+
+Export-ModuleMember -Function Get-Platform,Test-Platform
