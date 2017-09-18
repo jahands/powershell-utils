@@ -85,7 +85,7 @@ Function Set-AllowedHosts {
         [switch]$Windows,
         [switch]$Unix
     )
-    if ($Computers -and -not $Computers.Contains($env:COMPUTERNAME)) {
+    if ($Computers -ne $null -and -not $Computers.Contains($env:COMPUTERNAME)) {
         Write-Error "Computer: $($env:COMPUTERNAME) is not on list of valid computers: $($names -join ', ')" -ErrorAction:Stop
     }
     if(-not ($Windows -and $Unix)){

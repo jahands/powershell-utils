@@ -1,4 +1,4 @@
-# Generated on: 09/18/2017 14:42:24
+# Generated on: 09/18/2017 14:47:23
 # Description: Helpful PowerShell Modules
 # Author: Jacob Hands <jacob@gogit.io>
 
@@ -138,7 +138,7 @@ Function Set-AllowedHosts {
         [switch]$Windows,
         [switch]$Unix
     )
-    if ($Computers -and -not $Computers.Contains($env:COMPUTERNAME)) {
+    if ($Computers -ne $null -and -not $Computers.Contains($env:COMPUTERNAME)) {
         Write-Error "Computer: $($env:COMPUTERNAME) is not on list of valid computers: $($names -join ', ')" -ErrorAction:Stop
     }
     if(-not ($Windows -and $Unix)){
@@ -149,4 +149,4 @@ Function Set-AllowedHosts {
         }
     }
 }
-Export-ModuleMember -Function Get-Platform,Test-Platform
+Export-ModuleMember -Function Get-Platform,Test-Platform,Set-AllowedHosts
