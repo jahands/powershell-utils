@@ -679,3 +679,4 @@ Function New-DPDictionary {
         #>
     Return New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
 }
+Export-ModuleMember -Function New-DynamicParameter,New-DPDictionary
