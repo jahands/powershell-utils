@@ -537,7 +537,8 @@ Function New-DynamicParameter {
 
             foreach ($Parameter in $BoundKeys) {
                 Write-Debug "Setting existing variable for dynamic parameter '$Parameter' with value '$($BoundParameters.$Parameter)'"
-                Set-Variable -Name $Parameter -Value $BoundParameters.$Parameter -Scope 1 -Force
+                # Scope changed from 1 to 2 because it was not visible when imported into scripts.
+                Set-Variable -Name $Parameter -Value $BoundParameters.$Parameter -Scope 2 -Force
             }
         } else {
             Write-Verbose 'Looking for cached bound parameters'
