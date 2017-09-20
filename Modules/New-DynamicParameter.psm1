@@ -1,6 +1,7 @@
 # NOTE: This function is bound to license here:
 # https://gallery.technet.microsoft.com/scriptcenter/New-DynamicParameter-63389a46
 # I have added this here for convenience
+# Changes I've made to this script: https://git.io/v5hbb
 <#
 .SYNOPSIS
     Helper function to simplify creating dynamic parameters
