@@ -1,4 +1,4 @@
-# Generated on: 09/19/2017 11:53:01
+# Generated on: 09/20/2017 14:47:20
 # Description: Helpful PowerShell Modules
 # Author: Jacob Hands <jacob@gogit.io>
 
@@ -664,11 +664,10 @@ Function New-DynamicParameter {
         [switch]$CreateVariables,
 
         [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = 'CreateVariables')]
-        [ValidateNotNullOrEmpty()]
         [ValidateScript( {
                 # System.Management.Automation.PSBoundParametersDictionary is an internal sealed class,
                 # so one can't use PowerShell's '-is' operator to validate type.
-                if ($_.GetType().Name -ne 'PSBoundParametersDictionary') {
+                if ($_ -ne $null -and $_.GetType().Name -ne 'PSBoundParametersDictionary') {
                     Throw 'BoundParameters must be a System.Management.Automation.PSBoundParametersDictionary object'
                 }
                 $true
@@ -687,14 +686,19 @@ Function New-DynamicParameter {
 
     Process {
         if ($CreateVariables) {
-            Write-Verbose 'Creating variables from bound parameters'
-            Write-Debug 'Picking out bound parameters that are not in common parameters set'
-            $BoundKeys = $BoundParameters.Keys | Where-Object { $CommonParameters -notcontains $_ }
-
-            foreach ($Parameter in $BoundKeys) {
-                Write-Debug "Setting existing variable for dynamic parameter '$Parameter' with value '$($BoundParameters.$Parameter)'"
-                # Scope changed from 1 to 2 because it was not visible when imported into scripts.
-                Set-Variable -Name $Parameter -Value $BoundParameters.$Parameter -Scope 2 -Force
+            # Allow it to be null for optional parameters
+            if ($BoundParameters -ne $null) {
+                Write-Verbose 'Creating variables from bound parameters'
+                Write-Debug 'Picking out bound parameters that are not in common parameters set'
+                $BoundKeys = $BoundParameters.Keys | Where-Object { $CommonParameters -notcontains $_ }
+    
+                foreach ($Parameter in $BoundKeys) {
+                    Write-Debug "Setting existing variable for dynamic parameter '$Parameter' with value '$($BoundParameters.$Parameter)'"
+                    # Scope changed from 1 to 2 because it was not visible when imported into scripts.
+                    Set-Variable -Name $Parameter -Value $BoundParameters.$Parameter -Scope 2 -Force
+                }
+            }else{
+                Write-Verbose 'Skipping creation because BoundParameters is null'
             }
         } else {
             Write-Verbose 'Looking for cached bound parameters'
@@ -836,4 +840,4 @@ Function New-DPDictionary {
         #>
     Return New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
 }
-Export-ModuleMember -Function New-DynamicParameter,New-DPDictionary
+Export-ModuleMember -Function New-DynamicParameter, New-DPDictionary
