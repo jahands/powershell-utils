@@ -1,4 +1,4 @@
-# Generated on: 09/20/2017 14:47:20
+# Generated on: 09/22/2017 10:32:15
 # Description: Helpful PowerShell Modules
 # Author: Jacob Hands <jacob@gogit.io>
 
@@ -51,11 +51,37 @@ Export-ModuleMember -Function Invoke-Bash
 # ============================================ #
 
 # MultiPlatformUtils.psm1
+Function Set-PlatformVariables {
+    <#
+    .SYNOPSIS
+    Sets platform variables like on PS Core
+    
+    .DESCRIPTION
+    Sets platform variables like on PS Core.
+    Vars are $IsLinux, $IsWindows
+    $IsMacOS is not set because I'm unsure how to test for that.
+    Unsure if
+    #>
+    if($PSVersionTable.PSVersion -ne 'Core'){
+        $platform = [System.Environment]::OSVersion.Platform
+        if($platform -ieq 'Unix'){
+            Set-Variable -Name IsLinux -Value $true -Scope Global
+            Set-Variable -Name IsWindows -Value $false -Scope Global
+        }elseif($platform -ieq 'Win32NT'){
+            Set-Variable -Name IsLinux -Value $false -Scope Global
+            Set-Variable -Name IsWindows -Value $true -Scope Global
+        }
+    }
+}
+# Go ahead and set platform variables
+Set-PlatformVariables
 Function Get-Platform {
     <#
     .SYNOPSIS
     Gets platform name
     #>
+    [Obsolete('Checking value of global variables IsLinux and IsWindows should be used instead.')]
+    Param ()
     Return [System.Environment]::OSVersion.Platform
 }
 Function Test-Platform {
@@ -88,6 +114,7 @@ Function Test-Platform {
 
     .NOTES
     #>
+    [Obsolete('Checking value of global variables IsLinux and IsWindows should be used instead.')]
     Param (
         [Parameter(Mandatory = $true, ParameterSetName = 'Unix')]
         [switch]$Unix,
@@ -126,6 +153,10 @@ Function Set-AllowedHosts {
 
         .PARAMETER Unix
         Only allow script on Unix
+        Obsolete, use -Linux instead.
+
+        .PARAMETER Linux
+        Only allow script on Linux.
         
         .EXAMPLE
         Set-AllowedHosts ENVY10
@@ -136,20 +167,21 @@ Function Set-AllowedHosts {
     Param (
         [string[]]$Computers,
         [switch]$Windows,
-        [switch]$Unix
+        [Obsolete('This has been replaced by -Linux to match PS Core platform naming.')]
+        [switch]$Unix,
+        [switch]$Linux
     )
     if ($Computers -ne $null -and -not $Computers.Contains($env:COMPUTERNAME)) {
         Write-Error "Computer: $($env:COMPUTERNAME) is not on list of valid computers: $($Computers -join ', ')" -ErrorAction:Stop
     }
-    if(-not ($Windows -and $Unix)){
-        if($Windows -and -not (Test-Platform -Windows)){
-            Write-Error "Platform: $(Get-Platform) not allowed! Must be Windows." -ErrorAction:Stop
-        }elseif($Unix -and -not (Test-Platform -Unix)){
-            Write-Error "Platform: $(Get-Platform) not allowed! Must be Unix." -ErrorAction:Stop
-        }
+    if($IsLinux -and -not ($Linux -or $Unix)){
+        Write-Error 'This command cannot be run on Linux!'
+    }elseif($IsWindows -and -not $Windows){
+        Write-Error 'This command cannot be run on Windows!'
     }
 }
-Export-ModuleMember -Function Get-Platform,Test-Platform,Set-AllowedHosts
+
+Export-ModuleMember -Function Get-Platform,Test-Platform,Set-AllowedHosts,Set-PlatformVariables
 
 # ============================================ #
 
@@ -157,6 +189,7 @@ Export-ModuleMember -Function Get-Platform,Test-Platform,Set-AllowedHosts
 # NOTE: This function is bound to license here:
 # https://gallery.technet.microsoft.com/scriptcenter/New-DynamicParameter-63389a46
 # I have added this here for convenience
+# Changes I've made to this script: https://git.io/v5hbb
 <#
 .SYNOPSIS
     Helper function to simplify creating dynamic parameters
