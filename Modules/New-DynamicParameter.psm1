@@ -542,7 +542,7 @@ Function New-DynamicParameter {
                     # Scope changed from 1 to 2 because it was not visible when imported into scripts.
                     Set-Variable -Name $Parameter -Value $BoundParameters.$Parameter -Scope 2 -Force
                 }
-            }else{
+            } else {
                 Write-Verbose 'Skipping creation because BoundParameters is null'
             }
         } else {

@@ -9,14 +9,22 @@ Function Set-PlatformVariables {
     $IsMacOS is not set because I'm unsure how to test for that.
     Unsure if
     #>
-    if($PSVersionTable.PSVersion -ne 'Core'){
+    if ($PSVersionTable.PSEdition -ne 'Core') {
         $platform = [System.Environment]::OSVersion.Platform
-        if($platform -ieq 'Unix'){
-            Set-Variable -Name IsLinux -Value $true -Scope Global
-            Set-Variable -Name IsWindows -Value $false -Scope Global
-        }elseif($platform -ieq 'Win32NT'){
-            Set-Variable -Name IsLinux -Value $false -Scope Global
-            Set-Variable -Name IsWindows -Value $true -Scope Global
+        if ($platform -ieq 'Unix') {
+            if ($IsLinux -eq $null) {
+                Set-Variable -Name IsLinux -Value $true -Scope Global -Option Constant
+            }
+            if ($IsWindows -eq $null) {
+                Set-Variable -Name IsWindows -Value $false -Scope Global -Option Constant
+            }
+        } elseif ($platform -ieq 'Win32NT') {
+            if ($IsLinux -eq $null) {
+                Set-Variable -Name IsLinux -Value $false -Scope Global -Option Constant
+            }
+            if ($IsWindows -eq $null) {
+                Set-Variable -Name IsWindows -Value $true -Scope Global -Option Constant
+            }
         }
     }
 }
@@ -121,11 +129,11 @@ Function Set-AllowedHosts {
     if ($Computers -ne $null -and -not $Computers.Contains($env:COMPUTERNAME)) {
         Write-Error "Computer: $($env:COMPUTERNAME) is not on list of valid computers: $($Computers -join ', ')" -ErrorAction:Stop
     }
-    if($IsLinux -and -not ($Linux -or $Unix)){
-        Write-Error 'This command cannot be run on Linux!'
-    }elseif($IsWindows -and -not $Windows){
-        Write-Error 'This command cannot be run on Windows!'
+    if ($IsLinux -and -not ($Linux -or $Unix)) {
+        Write-Error 'This command cannot be run on Linux!' -ErrorAction:Stop
+    } elseif ($IsWindows -and -not $Windows) {
+        Write-Error 'This command cannot be run on Windows!' -ErrorAction:Stop
     }
 }
 
-Export-ModuleMember -Function Get-Platform,Test-Platform,Set-AllowedHosts,Set-PlatformVariables
+Export-ModuleMember -Function Get-Platform, Test-Platform, Set-AllowedHosts, Set-PlatformVariables
