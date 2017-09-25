@@ -129,10 +129,13 @@ Function Set-AllowedHosts {
     if ($Computers -ne $null -and -not $Computers.Contains($env:COMPUTERNAME)) {
         Write-Error "Computer: $($env:COMPUTERNAME) is not on list of valid computers: $($Computers -join ', ')" -ErrorAction:Stop
     }
-    if ($IsLinux -and -not ($Linux -or $Unix)) {
-        Write-Error 'This command cannot be run on Linux!' -ErrorAction:Stop
-    } elseif ($IsWindows -and -not $Windows) {
-        Write-Error 'This command cannot be run on Windows!' -ErrorAction:Stop
+    # Check if platform is specified
+    if($Windows -or $Unix -or $Linux){
+        if ($IsLinux -and -not ($Linux -or $Unix)) {
+            Write-Error 'This command cannot be run on Linux!' -ErrorAction:Stop
+        } elseif ($IsWindows -and -not $Windows) {
+            Write-Error 'This command cannot be run on Windows!' -ErrorAction:Stop
+        }
     }
 }
 
