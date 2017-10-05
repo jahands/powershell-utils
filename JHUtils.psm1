@@ -1,4 +1,4 @@
-# Generated on: 10/02/2017 11:50:18
+# Generated on: 10/05/2017 16:39:40
 # Description: Helpful PowerShell Modules
 # Author: Jacob Hands <jacob@gogit.io>
 
@@ -885,6 +885,35 @@ Function New-DPDictionary {
     Return New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
 }
 Export-ModuleMember -Function New-DynamicParameter, New-DPDictionary
+
+# ============================================ #
+
+# RandomFunctions.psm1
+Function Select-Duplicates {
+    <#
+    .SYNOPSIS
+    Selects items that are duplicated
+    #>
+    [CmdletBinding()]
+    Param (
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [ValidateNotNullOrEmpty()]
+        $Items
+    )
+    Begin {
+        $itemsToProcess = @()
+    }
+    Process {
+        foreach($item in $Items){
+            $itemsToProcess += $item
+        }
+    }
+    End {
+        $itemsToProcess | Group-Object |
+            Where-Object -FilterScript {$_.Count -gt 1}
+    }
+}
+Export-ModuleMember -Function Select-Duplicates
 
 # ============================================ #
 
